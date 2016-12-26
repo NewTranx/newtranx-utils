@@ -1,0 +1,7 @@
+target
+.cache*
+.idea
+*.iml
+.DS_Store
+dependency-reduced-pom.xml
+.settings
