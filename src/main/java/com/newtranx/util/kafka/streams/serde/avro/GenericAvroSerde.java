@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.newtranx.util.kafka.streams_avro;
+package com.newtranx.util.kafka.streams.serde.avro;
 
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import org.apache.avro.generic.GenericRecord;

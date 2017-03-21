@@ -14,43 +14,35 @@
  * limitations under the License.
  */
 
-package com.newtranx.util.kafka.streams_avro;
+package com.newtranx.util.kafka.streams.serde.avro;
 
-import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.Serializer;
+import org.apache.kafka.streams.kstream.Windowed;
+import org.apache.kafka.streams.kstream.internals.WindowedDeserializer;
+import org.apache.kafka.streams.kstream.internals.WindowedSerializer;
 
-import java.util.Collections;
 import java.util.Map;
 
-public class SpecificAvroSerde<T extends  org.apache.avro.specific.SpecificRecord> implements Serde<T> {
+public class WindowedSerde<T> implements Serde<Windowed<T>> {
 
-  private final Serde<T> inner;
+  private final Serde<Windowed<T>> inner;
 
-  /**
-   * Constructor used by Kafka Streams.
-   */
-  public SpecificAvroSerde() {
-    inner = Serdes.serdeFrom(new SpecificAvroSerializer<>(), new SpecificAvroDeserializer<>());
-  }
-
-  public SpecificAvroSerde(SchemaRegistryClient client) {
-    this(client, Collections.emptyMap());
-  }
-
-  public SpecificAvroSerde(SchemaRegistryClient client, Map<String, ?> props) {
-    inner = Serdes.serdeFrom(new SpecificAvroSerializer<>(client, props), new SpecificAvroDeserializer<>(client, props));
+  public WindowedSerde(Serde<T> serde) {
+    inner = Serdes.serdeFrom(
+        new WindowedSerializer<>(serde.serializer()),
+        new WindowedDeserializer<>(serde.deserializer()));
   }
 
   @Override
-  public Serializer<T> serializer() {
+  public Serializer<Windowed<T>> serializer() {
     return inner.serializer();
   }
 
   @Override
-  public Deserializer<T> deserializer() {
+  public Deserializer<Windowed<T>> deserializer() {
     return inner.deserializer();
   }
 

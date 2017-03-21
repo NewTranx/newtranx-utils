@@ -13,48 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.newtranx.util.kafka.streams_avro;
+
+package com.newtranx.util.kafka.streams.serde.avro;
 
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.common.serialization.Deserializer;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import static io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG;
-
-public class SpecificAvroDeserializer<T extends org.apache.avro.specific.SpecificRecord> implements Deserializer<T> {
+public class GenericAvroDeserializer implements Deserializer<GenericRecord> {
 
     KafkaAvroDeserializer inner;
 
     /**
      * Constructor used by Kafka Streams.
      */
-    public SpecificAvroDeserializer() {
+    public GenericAvroDeserializer() {
         inner = new KafkaAvroDeserializer();
     }
 
-    public SpecificAvroDeserializer(SchemaRegistryClient client) {
+    public GenericAvroDeserializer(SchemaRegistryClient client) {
         inner = new KafkaAvroDeserializer(client);
     }
 
-    public SpecificAvroDeserializer(SchemaRegistryClient client, Map<String, ?> props) {
+    public GenericAvroDeserializer(SchemaRegistryClient client, Map<String, ?> props) {
         inner = new KafkaAvroDeserializer(client, props);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void configure(Map<String, ?> configs, boolean isKey) {
-        Map<String, Object> effectiveConfigs = new HashMap<>(configs);
-        effectiveConfigs.put(SPECIFIC_AVRO_READER_CONFIG, true);
-        inner.configure(effectiveConfigs, isKey);
+        inner.configure(configs, isKey);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public T deserialize(String s, byte[] bytes) {
-        return (T) inner.deserialize(s, bytes);
+    public GenericRecord deserialize(String s, byte[] bytes) {
+        return (GenericRecord) inner.deserialize(s, bytes);
     }
 
     @Override
