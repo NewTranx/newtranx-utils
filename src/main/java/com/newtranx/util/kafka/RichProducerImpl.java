@@ -16,16 +16,6 @@
 
 package com.newtranx.util.kafka;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.Producer;
@@ -37,6 +27,12 @@ import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.ProducerFencedException;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.*;
+
 class RichProducerImpl<K, V> implements RichProducer<K, V> {
 
     public final Producer<K, V> producer;
@@ -47,14 +43,11 @@ class RichProducerImpl<K, V> implements RichProducer<K, V> {
 
     public CompletableFuture<RecordMetadata> send(ProducerRecord<K, V> record, Optional<Executor> optExecutor) {
         CompletableFuture<RecordMetadata> f = new CompletableFuture<RecordMetadata>();
-        this.producer.send(record, new Callback() {
-            @Override
-            public void onCompletion(RecordMetadata metadata, Exception exception) {
-                if (optExecutor.isPresent())
-                    optExecutor.get().execute(() -> onSendCompletion(metadata, exception, f));
-                else
-                    onSendCompletion(metadata, exception, f);
-            }
+        this.producer.send(record, (metadata, exception) -> {
+            if (optExecutor.isPresent())
+                optExecutor.get().execute(() -> onSendCompletion(metadata, exception, f));
+            else
+                onSendCompletion(metadata, exception, f);
         });
         return f;
     }
