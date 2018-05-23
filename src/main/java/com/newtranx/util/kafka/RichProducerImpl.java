@@ -42,7 +42,7 @@ class RichProducerImpl<K, V> implements RichProducer<K, V> {
     }
 
     public CompletableFuture<RecordMetadata> send(ProducerRecord<K, V> record, Optional<Executor> optExecutor) {
-        CompletableFuture<RecordMetadata> f = new CompletableFuture<RecordMetadata>();
+        CompletableFuture<RecordMetadata> f = new CompletableFuture<>();
         this.producer.send(record, (metadata, exception) -> {
             if (optExecutor.isPresent())
                 optExecutor.get().execute(() -> onSendCompletion(metadata, exception, f));
