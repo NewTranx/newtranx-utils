@@ -43,7 +43,7 @@ public class JwtAccessTokenConverterEx extends JwtAccessTokenConverter {
         this.defaultInstance = null;
     }
 
-    public JwtAccessTokenConverterEx(Map<String, String> pubKeys, JwtAccessTokenConverter defaultInstance) throws Exception {
+    public JwtAccessTokenConverterEx(Map<String, String> pubKeys, JwtAccessTokenConverter defaultInstance) {
         this(pubKeys);
         this.defaultInstance = defaultInstance;
     }
