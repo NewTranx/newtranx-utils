@@ -51,12 +51,12 @@ public class JwtAccessTokenConverterEx extends JwtAccessTokenConverter {
     protected Map<String, Object> decode(String token) {
         String kid = JwtHelper.headers(token).get("kid");
         final JwtAccessTokenConverter i;
-        if (kid == null && defaultInstance != null) {
-            i = defaultInstance;
-        } else if (kid == null && internal.size() == 1) {
-            i = internal.values().iterator().next();
-        } else if (kid != null) {
+        if (kid != null) {
             i = internal.get(kid);
+        } else if (defaultInstance != null) {
+            i = defaultInstance;
+        } else if (internal.size() == 1) {
+            i = internal.values().iterator().next();
         } else {
             throw new IllegalArgumentException("kid is required");
         }
