@@ -28,15 +28,16 @@ public class JwtAccessTokenConverterEx extends JwtAccessTokenConverter {
 
     private JwtAccessTokenConverter defaultInstance;
 
-    public JwtAccessTokenConverterEx(Map<String, String> pubKeys) throws Exception {
+    public JwtAccessTokenConverterEx(Map<String, String> pubKeys) {
         Map<String, JwtAccessTokenConverter> temp = new HashMap<>();
-        for (Map.Entry<String, String> e : pubKeys.entrySet()) {
-            String kid = e.getKey();
-            String key64 = e.getValue();
-            JwtAccessTokenConverter i = new JwtAccessTokenConverter();
-            i.setVerifierKey(key64);
-            i.afterPropertiesSet();
-            temp.put(kid, i);
+        if (pubKeys != null) {
+            for (Map.Entry<String, String> e : pubKeys.entrySet()) {
+                String kid = e.getKey();
+                String key64 = e.getValue();
+                JwtAccessTokenConverter i = new JwtAccessTokenConverter();
+                i.setVerifierKey(key64);
+                temp.put(kid, i);
+            }
         }
         internal = Collections.unmodifiableMap(temp);
         this.defaultInstance = null;
@@ -45,6 +46,14 @@ public class JwtAccessTokenConverterEx extends JwtAccessTokenConverter {
     public JwtAccessTokenConverterEx(Map<String, String> pubKeys, JwtAccessTokenConverter defaultInstance) throws Exception {
         this(pubKeys);
         this.defaultInstance = defaultInstance;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (defaultInstance != null) defaultInstance.afterPropertiesSet();
+        for (JwtAccessTokenConverter i : internal.values()) {
+            i.afterPropertiesSet();
+        }
     }
 
     @Override
