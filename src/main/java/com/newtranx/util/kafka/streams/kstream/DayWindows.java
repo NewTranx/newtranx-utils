@@ -34,12 +34,15 @@ public class DayWindows extends Windows<OffsetTimeWindow> {
 
     private final Set<ZoneOffset> zones;
 
-    private DayWindows(Set<ZoneOffset> zones) {
+    private final long graceMs;
+
+    public DayWindows(Set<ZoneOffset> zones, long graceMs) {
         this.zones = zones;
+        this.graceMs = graceMs;
     }
 
     public static DayWindows forZones(ZoneOffset... zones) {
-        return new DayWindows(new HashSet<>(Arrays.asList(zones)));
+        return new DayWindows(new HashSet<>(Arrays.asList(zones)), 24 * 60 * 60 * 1000L /* one day */);
     }
 
     @Override
@@ -58,6 +61,11 @@ public class DayWindows extends Windows<OffsetTimeWindow> {
     @Override
     public long size() {
         return SIZE_MS;
+    }
+
+    @Override
+    public long gracePeriodMs() {
+        return graceMs;
     }
 
     /**
