@@ -27,6 +27,7 @@ import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.ProducerFencedException;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -113,8 +114,14 @@ class RichProducerImpl<K, V> implements RichProducer<K, V> {
     }
 
     @Override
+    @Deprecated
     public void close(long arg0, TimeUnit arg1) {
         producer.close(arg0, arg1);
+    }
+
+    @Override
+    public void close(Duration timeout) {
+        producer.close(timeout);
     }
 
     @Override
